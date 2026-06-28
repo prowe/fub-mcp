@@ -29,14 +29,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Validate configuration
-try:
-    Config.validate()
-    logger.info("FUB MCP Server configuration validated successfully")
-except ValueError as e:
-    logger.error(f"Configuration error: {e}")
-    sys.exit(1)
-
 # Create MCP server
 server = Server("fub-mcp")
 
@@ -1163,6 +1155,14 @@ async def main():
     - Cursor IDE
     - Any MCP-compatible client
     """
+    # Validate configuration eagerly for stdio mode (fast fail on startup)
+    try:
+        Config.validate()
+        logger.info("FUB MCP Server configuration validated successfully")
+    except ValueError as e:
+        logger.error(f"Configuration error: {e}")
+        sys.exit(1)
+
     try:
         # Use stdio transport (standard for MCP, works with all clients)
         async with stdio_server() as (read_stream, write_stream):

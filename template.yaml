@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  FUB MCP Server – Lambda function with a Lambda URL endpoint.
+
+  The Follow Up Boss API key is NOT stored in the Lambda environment.
+  Each caller supplies their own key via the `fub_api_key` query parameter
+  on every request.
+
+# ---------------------------------------------------------------------------
+# Globals applied to every Serverless::Function in this template
+# ---------------------------------------------------------------------------
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures:
+      - arm64
+    Timeout: 60
+    MemorySize: 512
+    # Send Python logs straight to CloudWatch (no file I/O in Lambda)
+    Environment:
+      Variables:
+        PYTHONUNBUFFERED: "1"
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+Resources:
+
+  FubMcpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "fub-mcp-${AWS::StackName}"
+      Description: >
+        Follow Up Boss MCP Server.  Accepts MCP JSON-RPC 2.0 requests over
+        HTTP via a Lambda URL.  Callers must supply their Follow Up Boss API
+        key as the `fub_api_key` query parameter.
+      Handler: lambda_handler.lambda_handler
+      # CodeUri points at the repository root so SAM bundles lambda_handler.py
+      # together with the src/ package and installs requirements.txt.
+      CodeUri: .
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: BUFFERED
+        Cors:
+          AllowOrigins:
+            - "*"
+          AllowMethods:
+            - POST
+          AllowHeaders:
+            - content-type
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+Outputs:
+
+  FubMcpFunctionUrl:
+    Description: Lambda URL for the FUB MCP Server
+    Value: !GetAtt FubMcpFunctionUrl.FunctionUrl
+
+  FubMcpFunctionArn:
+    Description: ARN of the FUB MCP Lambda function
+    Value: !GetAtt FubMcpFunction.Arn
+
+  UsageExample:
+    Description: >
+      Example curl call – replace <URL> and <YOUR_KEY> with real values.
+    Value: !Sub >
+      curl -X POST "${FubMcpFunctionUrl.FunctionUrl}?fub_api_key=<YOUR_KEY>"
+      -H "Content-Type: application/json"
+      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'

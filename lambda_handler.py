@@ -21,11 +21,9 @@ import os
 import sys
 
 # ---------------------------------------------------------------------------
-# Logging: configure the root logger BEFORE importing fub_mcp.server.
-# server.py calls logging.basicConfig() with a file handler that writes to
-# 'fub_mcp_server.log' in the cwd (read-only in Lambda).  basicConfig() is a
-# no-op when the root logger already has handlers, so pre-configuring here
-# keeps Lambda output in CloudWatch only.
+# Logging: configure the root logger BEFORE importing fub_mcp.server so that
+# server.py's basicConfig() call (a no-op when handlers already exist) does
+# not add duplicate handlers.
 # ---------------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,

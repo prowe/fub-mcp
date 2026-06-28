@@ -1,0 +1,33 @@
+version = 0.1
+
+# ---------------------------------------------------------------------------
+# Default environment – used when no --config-env flag is passed
+# ---------------------------------------------------------------------------
+[default.global.parameters]
+stack_name = "fub-mcp"
+
+[default.build.parameters]
+cached     = true
+parallel   = true
+
+[default.validate.parameters]
+lint = true
+
+[default.deploy.parameters]
+capabilities      = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3        = true
+# Change this to your preferred deployment region
+region            = "us-east-1"
+
+# ---------------------------------------------------------------------------
+# Production environment  (sam deploy --config-env prod)
+# ---------------------------------------------------------------------------
+[prod.global.parameters]
+stack_name = "fub-mcp-prod"
+
+[prod.deploy.parameters]
+capabilities      = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3        = true
+region            = "us-east-1"

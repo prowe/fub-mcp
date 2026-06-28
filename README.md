@@ -253,6 +253,29 @@ pytest tests/test_crud.py
 
 **Test Results**: 26/26 tests passing ✅
 
+## AWS Lambda Deployment
+
+Deploy the MCP server as a **serverless Lambda function** with a public HTTPS
+endpoint using AWS SAM.  No API credentials are stored in the cloud — each
+caller passes their Follow Up Boss API key as a query parameter.
+
+```bash
+# Build and deploy
+sam build
+sam deploy --guided
+
+# Call the Lambda URL (replace placeholders)
+curl -X POST "https://<lambda-url>/?fub_api_key=<YOUR_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+See **[docs/guides/AWS_DEPLOYMENT.md](docs/guides/AWS_DEPLOYMENT.md)** for the
+full guide covering prerequisites, step-by-step deployment, MCP client
+configuration, and security considerations.
+
+---
+
 ## Documentation
 
 ### 📖 Quick Start
@@ -260,6 +283,7 @@ pytest tests/test_crud.py
 - **[docs/guides/QUICK_START_DISCOVERY.md](docs/guides/QUICK_START_DISCOVERY.md)** - Using discovery features
 
 ### 📚 Guides
+- **[docs/guides/AWS_DEPLOYMENT.md](docs/guides/AWS_DEPLOYMENT.md)** - **AWS Lambda deployment with SAM**
 - **[docs/guides/CRUD_GUIDE.md](docs/guides/CRUD_GUIDE.md)** - Complete CRUD operations guide
 - **[docs/guides/DUPLICATE_CHECK_GUIDE.md](docs/guides/DUPLICATE_CHECK_GUIDE.md)** - Duplicate detection
 - **[docs/guides/CURSOR_SETUP.md](docs/guides/CURSOR_SETUP.md)** - Cursor IDE setup

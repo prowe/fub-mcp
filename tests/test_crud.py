@@ -1,5 +1,6 @@
 """Tests for CRUD operations on People."""
 
+import json
 import pytest
 from unittest.mock import AsyncMock, patch
 from fub_mcp.server import call_tool
@@ -167,8 +168,7 @@ async def test_create_note():
         
         result = await call_tool("create_note", args)
         assert len(result) == 1
-        
-        import json
+
         response_data = json.loads(result[0].text)
         assert response_data["id"] == "n-123"
         assert response_data["personId"] == "12345"

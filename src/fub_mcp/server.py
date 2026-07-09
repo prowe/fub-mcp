@@ -17,6 +17,7 @@ from .config import Config
 from .fub_client import FUBClient
 from .processors import DataProcessors
 from .tools import get_all_tools
+from . import cache as cache_module
 
 # Configure logging
 logging.basicConfig(
@@ -575,8 +576,7 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             
             elif name == "create_note":
                 # Invalidate notes cache when creating
-                from .cache import get_cache_manager
-                cache_manager = get_cache_manager(enabled=Config.ENABLE_CACHING)
+                cache_manager = cache_module.get_cache_manager(enabled=Config.ENABLE_CACHING)
                 if cache_manager.enabled:
                     cache_manager.invalidate("/notes")
                 

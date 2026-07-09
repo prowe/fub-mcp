@@ -587,9 +587,9 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                     "personId": arguments["personId"]
                 }
                 if arguments.get("body") is None and arguments.get("subject") is None:
-                    raise ValueError("create_note requires at least one of 'body' or 'subject'")
+                    raise ValueError("create_note requires at least one of: body or subject")
                 note_data.update({
-                    field_name: arguments[field_name]
+                    field_name: arguments.get(field_name)
                     for field_name in ("body", "subject", "isHtml")
                     if arguments.get(field_name) is not None
                 })

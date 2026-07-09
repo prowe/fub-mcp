@@ -573,6 +573,20 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 result = await fub.get(f"/notes/{arguments['noteId']}")
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             
+            elif name == "create_note":
+                # Invalidate notes cache when creating
+                from .cache import get_cache_manager
+                cache_manager = get_cache_manager(enabled=Config.ENABLE_CACHING)
+                if cache_manager.enabled:
+                    cache_manager.invalidate("/notes")
+                
+                note_data = {
+                    "personId": arguments["personId"],
+                    "body": arguments["body"]
+                }
+                result = await fub.create_note(note_data)
+                return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
+            
             # APPOINTMENTS ENDPOINTS
             elif name == "get_appointments":
                 params = {"limit": arguments.get("limit", 20), "offset": arguments.get("offset", 0)}

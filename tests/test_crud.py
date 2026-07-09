@@ -149,3 +149,31 @@ async def test_get_custom_field():
         assert response_data["name"] == "customClosePrice"
         assert response_data["type"] == "number"
 
+
+@pytest.mark.asyncio
+async def test_create_note():
+    """Test creating a note."""
+    args = {
+        "personId": "12345",
+        "body": "Followed up with client and scheduled next steps."
+    }
+    
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.create_note = AsyncMock(return_value={"id": "n-123", "personId": "12345"})
+        mock_client_class.return_value = mock_client
+        
+        result = await call_tool("create_note", args)
+        assert len(result) == 1
+        
+        import json
+        response_data = json.loads(result[0].text)
+        assert response_data["id"] == "n-123"
+        assert response_data["personId"] == "12345"
+        
+        mock_client.create_note.assert_called_once_with({
+            "personId": "12345",
+            "body": "Followed up with client and scheduled next steps."
+        })

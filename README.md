@@ -191,7 +191,7 @@ See [docs/guides/MULTI_CLIENT_SETUP.md](docs/guides/MULTI_CLIENT_SETUP.md) for d
 ### Follow Up Boss Activity Data
 - `get_calls`, `get_call` - Phone call records
 - `get_events`, `get_event` - Activity events
-- `get_notes`, `get_note` - Contact notes
+- `get_notes`, `get_note`, `create_note` - Contact notes
 - `get_appointments`, `get_appointment` - Scheduled appointments
 
 ### Follow Up Boss Sales Data

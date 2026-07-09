@@ -732,6 +732,24 @@ def get_all_tools() -> List[Tool]:
                 "required": ["noteId"]
             }
         ),
+        Tool(
+            name="create_note",
+            description="Create a new note for a person/contact",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string",
+                        "description": "Person ID the note belongs to"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "Note content"
+                    }
+                },
+                "required": ["personId", "body"]
+            }
+        ),
         
         # APPOINTMENTS ENDPOINTS
         Tool(
@@ -939,4 +957,3 @@ def get_all_tools() -> List[Tool]:
             }
         ),
     ]
-

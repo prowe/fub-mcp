@@ -211,6 +211,25 @@ async def test_create_note_with_optional_fields():
 
 
 @pytest.mark.asyncio
+async def test_create_note_requires_body_or_subject():
+    """Test create_note validation when content fields are missing."""
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", {"personId": "12345"})
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data.get("error") is True
+        assert "body" in response_data.get("message", "")
+        assert "subject" in response_data.get("message", "")
+        mock_client.create_note.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_get_notes_with_sort():
     """Test getting notes with sort parameter."""
     args = {

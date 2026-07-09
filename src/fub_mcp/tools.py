@@ -759,7 +759,11 @@ def get_all_tools() -> List[Tool]:
                         "description": "Whether the body contains HTML"
                     }
                 },
-                "required": ["personId"]
+                "required": ["personId"],
+                "anyOf": [
+                    {"required": ["body"]},
+                    {"required": ["subject"]}
+                ]
             }
         ),
         

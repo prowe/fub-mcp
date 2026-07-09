@@ -230,6 +230,24 @@ async def test_create_note_requires_body_or_subject():
 
 
 @pytest.mark.asyncio
+async def test_create_note_rejects_empty_content():
+    """Test create_note rejects empty body and subject values."""
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", {"personId": "12345", "body": "   ", "subject": ""})
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data.get("error") is True
+        assert "non-empty" in response_data.get("message", "")
+        mock_client.create_note.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_get_notes_with_sort():
     """Test getting notes with sort parameter."""
     args = {

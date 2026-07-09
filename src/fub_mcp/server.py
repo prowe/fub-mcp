@@ -586,13 +586,18 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 note_data = {
                     "personId": arguments["personId"]
                 }
-                if arguments.get("body") is None and arguments.get("subject") is None:
-                    raise ValueError("create_note requires at least one of: body or subject")
-                note_data.update({
-                    field_name: arguments.get(field_name)
-                    for field_name in ("body", "subject", "isHtml")
-                    if arguments.get(field_name) is not None
-                })
+                body = arguments.get("body")
+                subject = arguments.get("subject")
+                has_body = isinstance(body, str) and body.strip() != ""
+                has_subject = isinstance(subject, str) and subject.strip() != ""
+                if not (has_body or has_subject):
+                    raise ValueError("create_note requires non-empty body or subject")
+                if has_body:
+                    note_data["body"] = body
+                if has_subject:
+                    note_data["subject"] = subject
+                if "isHtml" in arguments and arguments.get("isHtml") is not None:
+                    note_data["isHtml"] = arguments.get("isHtml")
                 result = await fub.create_note(note_data)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             

@@ -39,7 +39,7 @@
 - ✅ `get_tasks` - List tasks
 - ✅ `get_task` - Get specific task by ID
 
-#### 📝 Notes (3 tools)
+#### 📝 Read/Write - Notes (3 tools)
 - ✅ `get_notes` - List notes
 - ✅ `get_note` - Get specific note by ID
 - ✅ `create_note` - Create new notes

@@ -414,7 +414,7 @@ class FUBClient:
         Create a new note.
 
         Args:
-            note_data: Note payload (e.g., personId, body)
+            note_data: Note payload (personId required; body, subject, isHtml optional)
 
         Returns:
             Created note data

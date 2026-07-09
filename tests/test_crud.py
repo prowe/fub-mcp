@@ -177,3 +177,63 @@ async def test_create_note():
             "personId": "12345",
             "body": "Followed up with client and scheduled next steps."
         })
+
+
+@pytest.mark.asyncio
+async def test_create_note_with_optional_fields():
+    """Test creating a note with optional Follow Up Boss fields."""
+    args = {
+        "personId": "12345",
+        "subject": "Listing update",
+        "body": "<p>Updated listing details.</p>",
+        "isHtml": True
+    }
+
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.create_note = AsyncMock(return_value={"id": "n-124", "personId": "12345"})
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", args)
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data["id"] == "n-124"
+
+        mock_client.create_note.assert_called_once_with({
+            "personId": "12345",
+            "subject": "Listing update",
+            "body": "<p>Updated listing details.</p>",
+            "isHtml": True
+        })
+
+
+@pytest.mark.asyncio
+async def test_get_notes_with_sort():
+    """Test getting notes with sort parameter."""
+    args = {
+        "personId": "12345",
+        "limit": 10,
+        "offset": 5,
+        "sort": "-created"
+    }
+
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.get = AsyncMock(return_value={"notes": [{"id": "n-1"}]})
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("get_notes", args)
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert "notes" in response_data
+
+        mock_client.get.assert_called_once_with(
+            "/notes",
+            params={"limit": 10, "offset": 5, "personId": "12345", "sort": "-created"}
+        )

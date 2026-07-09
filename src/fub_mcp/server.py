@@ -567,6 +567,8 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 params = {"limit": arguments.get("limit", 20), "offset": arguments.get("offset", 0)}
                 if arguments.get("personId"):
                     params["personId"] = arguments["personId"]
+                if arguments.get("sort"):
+                    params["sort"] = arguments["sort"]
                 result = await fub.get("/notes", params=params)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             
@@ -581,9 +583,14 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                     cache_manager.invalidate("/notes")
                 
                 note_data = {
-                    "personId": arguments["personId"],
-                    "body": arguments["body"]
+                    "personId": arguments["personId"]
                 }
+                if arguments.get("body") is not None:
+                    note_data["body"] = arguments["body"]
+                if arguments.get("subject") is not None:
+                    note_data["subject"] = arguments["subject"]
+                if arguments.get("isHtml") is not None:
+                    note_data["isHtml"] = arguments["isHtml"]
                 result = await fub.create_note(note_data)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             

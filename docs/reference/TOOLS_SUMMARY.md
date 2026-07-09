@@ -39,9 +39,10 @@
 - ✅ `get_tasks` - List tasks
 - ✅ `get_task` - Get specific task by ID
 
-#### 📝 Read - Notes (2 tools)
+#### 📝 Read/Write - Notes (3 tools)
 - ✅ `get_notes` - List notes
 - ✅ `get_note` - Get specific note by ID
+- ✅ `create_note` - Create new notes
 
 #### 📆 Read - Appointments (2 tools)
 - ✅ `get_appointments` - List appointments
@@ -74,7 +75,6 @@
 - ❌ `delete_deal` - Delete deals
 
 ### Notes
-- ❌ `create_note` - Create new notes
 - ❌ `update_note` - Update existing notes
 - ❌ `delete_note` - Delete notes
 
@@ -118,7 +118,7 @@ Based on FUB API documentation, these endpoints may also be available but not ye
 | People | ✅ | ✅ | ✅ | ✅ | **4/4** |
 | Custom Fields | ✅ | ✅ | ✅ | ✅ | **4/4** |
 | Deals | ✅ | ❌ | ❌ | ❌ | **1/4** |
-| Notes | ✅ | ❌ | ❌ | ❌ | **1/4** |
+| Notes | ✅ | ✅ | ❌ | ❌ | **2/4** |
 | Tasks | ✅ | ❌ | ❌ | ❌ | **1/4** |
 | Appointments | ✅ | ❌ | ❌ | ❌ | **1/4** |
 | Events | ✅ | ❌ | ❌ | ❌ | **1/4** |
@@ -177,4 +177,3 @@ Based on FUB API documentation, these endpoints may also be available but not ye
 
 **Last Updated:** 2025-10-31  
 **Version:** 0.3.0 (Custom Fields CRUD)
-

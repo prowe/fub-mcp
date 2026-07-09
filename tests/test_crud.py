@@ -1,5 +1,6 @@
 """Tests for CRUD operations on People."""
 
+import json
 import pytest
 from unittest.mock import AsyncMock, patch
 from fub_mcp.server import call_tool
@@ -149,3 +150,127 @@ async def test_get_custom_field():
         assert response_data["name"] == "customClosePrice"
         assert response_data["type"] == "number"
 
+
+@pytest.mark.asyncio
+async def test_create_note():
+    """Test creating a note."""
+    args = {
+        "personId": "12345",
+        "body": "Followed up with client and scheduled next steps."
+    }
+    
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.create_note = AsyncMock(return_value={"id": "n-123", "personId": "12345"})
+        mock_client_class.return_value = mock_client
+        
+        result = await call_tool("create_note", args)
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data["id"] == "n-123"
+        assert response_data["personId"] == "12345"
+        
+        mock_client.create_note.assert_called_once_with({
+            "personId": "12345",
+            "body": "Followed up with client and scheduled next steps."
+        })
+
+
+@pytest.mark.asyncio
+async def test_create_note_with_optional_fields():
+    """Test creating a note with optional Follow Up Boss fields."""
+    args = {
+        "personId": "12345",
+        "subject": "Listing update",
+        "body": "<p>Updated listing details.</p>",
+        "isHtml": True
+    }
+
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.create_note = AsyncMock(return_value={"id": "n-124", "personId": "12345"})
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", args)
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data["id"] == "n-124"
+
+        mock_client.create_note.assert_called_once_with({
+            "personId": "12345",
+            "subject": "Listing update",
+            "body": "<p>Updated listing details.</p>",
+            "isHtml": True
+        })
+
+
+@pytest.mark.asyncio
+async def test_create_note_requires_body_or_subject():
+    """Test create_note validation when content fields are missing."""
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", {"personId": "12345"})
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data.get("error") is True
+        assert "body" in response_data.get("message", "")
+        assert "subject" in response_data.get("message", "")
+        mock_client.create_note.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_create_note_rejects_empty_content():
+    """Test create_note rejects empty body and subject values."""
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("create_note", {"personId": "12345", "body": "   ", "subject": ""})
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert response_data.get("error") is True
+        assert "non-empty" in response_data.get("message", "")
+        mock_client.create_note.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_get_notes_with_sort():
+    """Test getting notes with sort parameter."""
+    args = {
+        "personId": "12345",
+        "limit": 10,
+        "offset": 5,
+        "sort": "-created"
+    }
+
+    with patch("fub_mcp.server.FUBClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock_client.get = AsyncMock(return_value={"notes": [{"id": "n-1"}]})
+        mock_client_class.return_value = mock_client
+
+        result = await call_tool("get_notes", args)
+        assert len(result) == 1
+
+        response_data = json.loads(result[0].text)
+        assert "notes" in response_data
+
+        mock_client.get.assert_called_once_with(
+            "/notes",
+            params={"limit": 10, "offset": 5, "personId": "12345", "sort": "-created"}
+        )

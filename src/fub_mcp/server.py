@@ -17,6 +17,7 @@ from .config import Config
 from .fub_client import FUBClient
 from .processors import DataProcessors
 from .tools import get_all_tools
+from . import cache as cache_module
 
 # Configure logging
 logging.basicConfig(
@@ -566,11 +567,38 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 params = {"limit": arguments.get("limit", 20), "offset": arguments.get("offset", 0)}
                 if arguments.get("personId"):
                     params["personId"] = arguments["personId"]
+                if arguments.get("sort"):
+                    params["sort"] = arguments["sort"]
                 result = await fub.get("/notes", params=params)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             
             elif name == "get_note":
                 result = await fub.get(f"/notes/{arguments['noteId']}")
+                return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
+            
+            elif name == "create_note":
+                # Invalidate notes cache when creating
+                if Config.ENABLE_CACHING:
+                    cache_manager = cache_module.get_cache_manager(enabled=True)
+                    if cache_manager.enabled:
+                        cache_manager.invalidate("/notes")
+                
+                note_data = {
+                    "personId": arguments["personId"]
+                }
+                body = arguments.get("body")
+                subject = arguments.get("subject")
+                has_body = isinstance(body, str) and body.strip() != ""
+                has_subject = isinstance(subject, str) and subject.strip() != ""
+                if not (has_body or has_subject):
+                    raise ValueError("create_note requires non-empty body or subject")
+                if has_body:
+                    note_data["body"] = body
+                if has_subject:
+                    note_data["subject"] = subject
+                if arguments.get("isHtml") is not None:
+                    note_data["isHtml"] = arguments.get("isHtml")
+                result = await fub.create_note(note_data)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]
             
             # APPOINTMENTS ENDPOINTS

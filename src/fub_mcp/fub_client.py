@@ -408,6 +408,18 @@ class FUBClient:
             Deletion confirmation
         """
         return await self.delete(f"/people/{person_id}")
+
+    async def create_note(self, note_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a new note.
+
+        Args:
+            note_data: Note payload (personId required; body, subject, isHtml optional)
+
+        Returns:
+            Created note data
+        """
+        return await self.post("/notes", json_data=note_data)
     
     # Custom Fields Operations
     
@@ -455,4 +467,3 @@ class FUBClient:
             Deletion confirmation
         """
         return await self.delete(f"/customFields/{custom_field_id}")
-

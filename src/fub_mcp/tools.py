@@ -714,6 +714,10 @@ def get_all_tools() -> List[Tool]:
                         "type": "number",
                         "description": "Number of results to skip",
                         "default": 0
+                    },
+                    "sort": {
+                        "type": "string",
+                        "description": "Sort order (e.g., '-created' for newest first)"
                     }
                 }
             }
@@ -730,6 +734,32 @@ def get_all_tools() -> List[Tool]:
                     }
                 },
                 "required": ["noteId"]
+            }
+        ),
+        Tool(
+            name="create_note",
+            description="Create a new note for a person/contact (at least one of body or subject is required)",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string",
+                        "description": "Person ID the note belongs to"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "Note content"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "description": "Optional note subject/title"
+                    },
+                    "isHtml": {
+                        "type": "boolean",
+                        "description": "Whether the body contains HTML"
+                    }
+                },
+                "required": ["personId"]
             }
         ),
         
@@ -939,4 +969,3 @@ def get_all_tools() -> List[Tool]:
             }
         ),
     ]
-

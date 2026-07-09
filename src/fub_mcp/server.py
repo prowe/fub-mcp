@@ -596,7 +596,7 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                     note_data["body"] = body
                 if has_subject:
                     note_data["subject"] = subject
-                if "isHtml" in arguments and arguments.get("isHtml") is not None:
+                if arguments.get("isHtml") is not None:
                     note_data["isHtml"] = arguments.get("isHtml")
                 result = await fub.create_note(note_data)
                 return [TextContent(type="text", text=json.dumps(result, indent=2, default=str))]

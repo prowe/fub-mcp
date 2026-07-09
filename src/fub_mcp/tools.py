@@ -738,7 +738,7 @@ def get_all_tools() -> List[Tool]:
         ),
         Tool(
             name="create_note",
-            description="Create a new note for a person/contact",
+            description="Create a new note for a person/contact (at least one of body or subject is required)",
             inputSchema={
                 "type": "object",
                 "properties": {

@@ -578,9 +578,10 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             
             elif name == "create_note":
                 # Invalidate notes cache when creating
-                cache_manager = cache_module.get_cache_manager(enabled=Config.ENABLE_CACHING)
-                if cache_manager.enabled:
-                    cache_manager.invalidate("/notes")
+                if Config.ENABLE_CACHING:
+                    cache_manager = cache_module.get_cache_manager(enabled=True)
+                    if cache_manager.enabled:
+                        cache_manager.invalidate("/notes")
                 
                 note_data = {
                     "personId": arguments["personId"]
